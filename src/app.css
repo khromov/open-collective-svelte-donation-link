@@ -50,10 +50,18 @@
 }
 
 html {
-	/* Everything is sized in rem, so the whole UI scales with the tablet. */
-	font-size: clamp(11px, 2.2vmin, 32px);
+	/* Everything is sized in rem, so the whole UI scales with the tablet.
+	   Capped by the short side *and* the long one, so squarish screens shrink the
+	   controls instead of squeezing the QR code out. */
+	font-size: min(2.2vw, 1.75vh, 32px);
 	height: 100%;
 	-webkit-text-size-adjust: 100%;
+}
+
+@media (orientation: landscape) {
+	html {
+		font-size: min(2.2vh, 1.8vw, 32px);
+	}
 }
 
 body {

@@ -5,9 +5,9 @@ A big, chunky, tablet-friendly screen for collecting donations to the
 
 **Live:** https://khromov.github.io/open-collective-svelte-donation-link/
 
-- Pick $5, $10, $20 or $50, one time or monthly.
+- Pick $5, $10, $20 or $50, one time, monthly or yearly.
 - The QR code updates to the matching Open Collective donation URL; scan it and finish on your phone.
-- Choosing *Monthly* triggers a celebratory explosion of Rich Harris.
+- Choosing *Monthly* or *Yearly* triggers a celebratory explosion of Rich Harris.
 - After 30 seconds without a touch the screen returns to its defaults ($10, one time).
 
 Amounts, defaults and the timeout live in [`src/lib/config.ts`](src/lib/config.ts).

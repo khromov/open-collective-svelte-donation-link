@@ -2,26 +2,30 @@
 	import {
 		AMOUNTS,
 		DEFAULT_AMOUNT,
-		DEFAULT_RECURRING,
+		DEFAULT_INTERVAL,
+		INTERVALS,
 		RESET_AFTER_MS,
 		WARN_FOR_MS,
 		donationUrl,
-		type Amount
+		type Amount,
+		type Interval
 	} from './lib/config';
 	import QrCode from './lib/QrCode.svelte';
 	import RichExplosion from './lib/RichExplosion.svelte';
 	import logo from './assets/svelte-logo.svg';
+	import rich from './assets/rich.png';
 
 	let amount = $state<Amount>(DEFAULT_AMOUNT);
-	let recurring = $state(DEFAULT_RECURRING);
+	let interval = $state<Interval>(DEFAULT_INTERVAL);
 
 	let lastTouch = $state(Date.now());
 	let now = $state(Date.now());
 
 	let explosion: RichExplosion;
 
-	const url = $derived(donationUrl(amount, recurring));
-	const dirty = $derived(amount !== DEFAULT_AMOUNT || recurring !== DEFAULT_RECURRING);
+	const url = $derived(donationUrl(amount, interval));
+	const recurring = $derived(interval !== 'oneTime');
+	const dirty = $derived(amount !== DEFAULT_AMOUNT || interval !== DEFAULT_INTERVAL);
 	const remaining = $derived(Math.max(0, RESET_AFTER_MS - (now - lastTouch)));
 	const warning = $derived(dirty && remaining <= WARN_FOR_MS);
 
@@ -31,16 +35,22 @@
 
 	function reset() {
 		amount = DEFAULT_AMOUNT;
-		recurring = DEFAULT_RECURRING;
+		interval = DEFAULT_INTERVAL;
 	}
 
-	function setRecurring(next: boolean, event: MouseEvent) {
-		if (next && !recurring) {
+	function chooseInterval(next: Interval, event: MouseEvent) {
+		// Every fresh commitment to a recurring donation earns a burst of Rich.
+		if (next !== 'oneTime' && next !== interval) {
 			const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
 			explosion.burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
 		}
-		recurring = next;
+		interval = next;
 	}
+
+	// Handy when checking the kiosk from devtools.
+	$effect(() => {
+		console.log(url);
+	});
 
 	// Idle clock: only runs while the screen differs from its defaults.
 	$effect(() => {
@@ -76,8 +86,8 @@
 		</div>
 		<h1>Support Svelte</h1>
 		<p>
-			Svelte is free, open source, and funded by people like you. Pick an amount, scan the code
-			with your phone, and finish there.
+			Enjoy the free swag, and donate to Svelte! Svelte is free, open source, and funded by people
+			like you. Pick an amount and scan the code with your phone.
 		</p>
 	</header>
 
@@ -102,43 +112,37 @@
 	<section class="frequency">
 		<h2 id="frequency-label">How often</h2>
 		<div class="grid" role="radiogroup" aria-labelledby="frequency-label">
-			<button
-				type="button"
-				role="radio"
-				class="raised choice"
-				class:selected={!recurring}
-				aria-checked={!recurring}
-				onclick={(event) => setRecurring(false, event)}
-			>
-				One time
-			</button>
-			<button
-				type="button"
-				role="radio"
-				class="raised choice"
-				class:selected={recurring}
-				aria-checked={recurring}
-				onclick={(event) => setRecurring(true, event)}
-			>
-				Monthly
-			</button>
+			{#each INTERVALS as option (option.id)}
+				<button
+					type="button"
+					role="radio"
+					class="raised choice"
+					class:selected={interval === option.id}
+					aria-checked={interval === option.id}
+					onclick={(event) => chooseInterval(option.id, event)}
+				>
+					{option.label}
+				</button>
+			{/each}
 		</div>
 	</section>
 
 	<aside class="scan">
-		<div class="card">
-			<QrCode value={url} />
-		</div>
-		<div class="slot">
-			{#if warning}
-				<div class="countdown" role="status">
-					<span>Starting over in {Math.ceil(remaining / 1000)}s — tap anywhere to stay</span>
-					<i style:width="{(remaining / WARN_FOR_MS) * 100}%"></i>
-				</div>
-			{/if}
+		<div class="card-wrap">
+			<img class="peek" class:up={recurring} src={rich} alt="" />
+			<div class="card">
+				<QrCode value={url} />
+			</div>
 		</div>
 	</aside>
 </main>
+
+{#if warning}
+	<div class="countdown" role="status">
+		<span>Starting over in {Math.ceil(remaining / 1000)}s — tap to stay</span>
+		<i style:width="{(remaining / WARN_FOR_MS) * 100}%"></i>
+	</div>
+{/if}
 
 <RichExplosion bind:this={explosion} />
 
@@ -251,18 +255,41 @@
 
 	.amounts .grid {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
-		grid-auto-rows: minmax(7.5rem, 1fr);
+		grid-auto-rows: minmax(6.4rem, 1fr);
 	}
 
 	.frequency .grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		grid-auto-rows: 5.6rem;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-auto-rows: 4.8rem;
 	}
 
 	@media (orientation: landscape) {
 		.amounts .grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 			grid-auto-rows: minmax(0, 1fr);
+		}
+	}
+
+	/* Squarish portrait screens: trim the controls so the QR code keeps its room. */
+	@media (orientation: portrait) and (min-aspect-ratio: 4 / 5) {
+		h1 {
+			font-size: 3.6rem;
+		}
+
+		.amounts .grid {
+			grid-auto-rows: minmax(5.4rem, 1fr);
+		}
+
+		.frequency .grid {
+			grid-auto-rows: 4.4rem;
+		}
+
+		.amount {
+			font-size: 3.4rem;
+		}
+
+		.choice {
+			font-size: 1.6rem;
 		}
 	}
 
@@ -325,7 +352,7 @@
 	}
 
 	.choice {
-		font-size: 1.9rem;
+		font-size: 1.7rem;
 		font-weight: 600;
 	}
 
@@ -340,19 +367,19 @@
 		align-items: center;
 		justify-content: center;
 		--pad: 1.4rem;
-		/* Room kept free under the card for the idle countdown. */
-		--slot: 4rem;
+		/* Headroom above the card for Rich to peek out of. */
+		--peek: 3.2rem;
 	}
 
-	.slot {
-		height: var(--slot);
-		display: flex;
-		align-items: flex-end;
+	.card-wrap {
+		position: relative;
+		margin-top: var(--peek);
 	}
 
 	.card {
+		position: relative;
 		/* The largest square that fits the slot. */
-		width: min(100cqw, 100cqh - var(--slot));
+		width: min(100cqw, 100cqh - var(--peek));
 		aspect-ratio: 1;
 		padding: var(--pad);
 		border-radius: calc(var(--radius) * 1.6);
@@ -362,10 +389,37 @@
 		filter: var(--shadow);
 	}
 
+	/* Rich pops up from behind the card for recurring donations. */
+	.peek {
+		position: absolute;
+		right: 1.6rem;
+		top: 0;
+		width: 6.4rem;
+		height: auto;
+		transform: translateY(10%) rotate(8deg);
+		transition: transform 0.25s ease-in;
+	}
+
+	.peek.up {
+		transform: translateY(-58%) rotate(8deg);
+		transition: transform 0.5s 0.35s cubic-bezier(0.3, 1.7, 0.5, 1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.peek {
+			transition: none;
+		}
+	}
+
 	/* ---------- idle countdown ---------- */
 
 	.countdown {
-		position: relative;
+		position: fixed;
+		top: 1.2rem;
+		right: 1.2rem;
+		z-index: 5;
+		pointer-events: none;
+		filter: var(--shadow);
 		overflow: hidden;
 		padding: 0.7rem 1.6rem 1rem;
 		border-radius: 999px;

@@ -12,7 +12,7 @@
 	--bg-accent: #d43008;
 
 	--raised-highlight: #f2f2f2;
-	--raised-shadow: #cfcfcf;
+	--raised-shadow: #dbdbdb;
 	--primary-highlight: #f8603a;
 	--primary-shadow: #942205;
 
@@ -35,7 +35,7 @@
 		--bg-accent: #b32d00;
 
 		--raised-highlight: hsl(220, 15%, 32%);
-		--raised-shadow: hsl(220, 12%, 6%);
+		--raised-shadow: hsl(220, 12%, 8%);
 		--primary-highlight: #f8603a;
 		--primary-shadow: #5c1502;
 

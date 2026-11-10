@@ -11,7 +11,6 @@
 	import QrCode from './lib/QrCode.svelte';
 	import RichExplosion from './lib/RichExplosion.svelte';
 	import logo from './assets/svelte-logo.svg';
-	import rich from './assets/rich.png';
 
 	let amount = $state<Amount>(DEFAULT_AMOUNT);
 	let recurring = $state(DEFAULT_RECURRING);
@@ -121,28 +120,14 @@
 				aria-checked={recurring}
 				onclick={(event) => setRecurring(true, event)}
 			>
-				<img src={rich} alt="" />
 				Monthly
 			</button>
 		</div>
 	</section>
 
 	<aside class="scan">
-		<div class="card-wrap">
-			<img class="peek" class:up={recurring} src={rich} alt="" />
-			<div class="card">
-				<div class="code">
-					<QrCode value={url} />
-				</div>
-				<div class="details" aria-live="polite">
-					<h2>Scan to donate</h2>
-					<p class="summary">
-						<strong>${amount}</strong>
-						{recurring ? 'every month' : 'one time'}
-					</p>
-					<p class="where">opencollective.com/svelte</p>
-				</div>
-			</div>
+		<div class="card">
+			<QrCode value={url} />
 		</div>
 		<div class="slot">
 			{#if warning}
@@ -281,7 +266,7 @@
 		}
 	}
 
-	/* svelte.dev's bevelled "raised" button, made chunky. */
+	/* svelte.dev's bevelled "raised" button, kept as light as the original. */
 	.raised {
 		--edge: var(--raised-highlight) var(--raised-shadow) var(--raised-shadow)
 			var(--raised-highlight);
@@ -296,7 +281,7 @@
 		margin: 0;
 		padding: 0;
 		border-style: solid;
-		border-width: 0.15rem 0.45rem 0.45rem 0.15rem;
+		border-width: 0.08rem 0.2rem 0.2rem 0.08rem;
 		border-color: var(--edge);
 		border-radius: var(--radius);
 		background: var(--bg-3);
@@ -311,7 +296,7 @@
 
 	.raised:active,
 	.raised.selected {
-		border-width: 0.45rem 0.15rem 0.15rem 0.45rem;
+		border-width: 0.2rem 0.08rem 0.08rem 0.2rem;
 		border-color: var(--pressed);
 	}
 
@@ -344,16 +329,6 @@
 		font-weight: 600;
 	}
 
-	.choice img {
-		height: 2.6rem;
-		width: auto;
-		transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
-	}
-
-	.choice.selected img {
-		transform: scale(1.25) rotate(-8deg);
-	}
-
 	/* ---------- QR card ---------- */
 
 	.scan {
@@ -364,12 +339,9 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		--pad: 1.6rem;
-		--peek: 3.2rem;
-		--details: 8.4rem;
+		--pad: 1.4rem;
 		/* Room kept free under the card for the idle countdown. */
 		--slot: 4rem;
-		--free: calc(100cqh - 2 * var(--pad) - var(--peek) - var(--slot));
 	}
 
 	.slot {
@@ -378,98 +350,16 @@
 		align-items: flex-end;
 	}
 
-	.card-wrap {
-		position: relative;
-		margin-top: var(--peek);
-		/* Stacked card: QR on top, details below. */
-		--code: min(100cqw - 2 * var(--pad), var(--free) - var(--details));
-	}
-
 	.card {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		gap: 1.2rem;
+		/* The largest square that fits the slot. */
+		width: min(100cqw, 100cqh - var(--slot));
+		aspect-ratio: 1;
 		padding: var(--pad);
 		border-radius: calc(var(--radius) * 1.6);
 		/* Always light: a QR code wants a white quiet zone. */
 		background: #fff;
-		color: #141414;
-		border: 0.15rem solid var(--border);
+		border: 0.1rem solid var(--border);
 		filter: var(--shadow);
-	}
-
-	.code {
-		width: var(--code);
-		height: var(--code);
-	}
-
-	.details {
-		text-align: center;
-	}
-
-	.details h2 {
-		margin: 0;
-		font: 400 2.4rem / 1.1 var(--font-heading);
-	}
-
-	.summary {
-		margin: 0.5rem 0 0;
-		font-size: 1.6rem;
-		line-height: 1.2;
-	}
-
-	.summary strong {
-		font-weight: 600;
-		color: #d43008;
-	}
-
-	.where {
-		margin: 0.5rem 0 0;
-		font-size: 1.1rem;
-		color: #666;
-	}
-
-	/* Wide slot (portrait tablets): QR left, details right. */
-	@container (min-aspect-ratio: 5 / 4) {
-		.card-wrap {
-			--code: min(var(--free), 46cqw);
-		}
-
-		.card {
-			flex-direction: row;
-			align-items: center;
-			gap: 2rem;
-			padding-right: 2.6rem;
-		}
-
-		.details {
-			text-align: left;
-		}
-
-		.details h2 {
-			font-size: 3rem;
-		}
-
-		.summary {
-			font-size: 2rem;
-		}
-	}
-
-	/* Rich pops up from behind the card for recurring donations. */
-	.peek {
-		position: absolute;
-		right: 1.6rem;
-		top: 0;
-		width: 6.4rem;
-		height: auto;
-		transform: translateY(10%) rotate(8deg);
-		transition: transform 0.25s ease-in;
-	}
-
-	.peek.up {
-		transform: translateY(-58%) rotate(8deg);
-		transition: transform 0.5s 0.35s cubic-bezier(0.3, 1.7, 0.5, 1);
 	}
 
 	/* ---------- idle countdown ---------- */
@@ -496,10 +386,4 @@
 		transition: width 0.2s linear;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.peek,
-		.choice img {
-			transition: none;
-		}
-	}
 </style>

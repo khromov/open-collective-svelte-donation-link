@@ -1,0 +1,82 @@
+/* Tokens lifted from svelte.dev (--sk-*), scaled up for a touch kiosk. */
+:root {
+	color-scheme: light dark;
+
+	--bg-1: #fff;
+	--bg-3: #fafafa;
+	--bg-4: #f2f2f2;
+	--fg-1: #141414;
+	--fg-3: #666;
+	--border: #ebebeb;
+	--fg-accent: #d43008;
+	--bg-accent: #d43008;
+
+	--raised-highlight: #f2f2f2;
+	--raised-shadow: #cfcfcf;
+	--primary-highlight: #f8603a;
+	--primary-shadow: #942205;
+
+	--font-heading: 'DM Serif Display', Georgia, serif;
+	--font-ui: 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+	--radius: 1rem;
+	--shadow: drop-shadow(0 0 1.2rem #0000001a);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-1: hsl(220, 10%, 12%);
+		--bg-3: hsl(220, 14%, 16%);
+		--bg-4: hsl(220, 15%, 21%);
+		--fg-1: hsl(220, 2%, 90%);
+		--fg-3: hsl(220, 5%, 65%);
+		--border: hsl(220, 15%, 22%);
+		--fg-accent: #f96743;
+		--bg-accent: #b32d00;
+
+		--raised-highlight: hsl(220, 15%, 32%);
+		--raised-shadow: hsl(220, 12%, 6%);
+		--primary-highlight: #f8603a;
+		--primary-shadow: #5c1502;
+
+		--shadow: drop-shadow(0.1rem 0.2rem 1.4rem #00000080);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	/* Everything is sized in rem, so the whole UI scales with the tablet. */
+	font-size: clamp(11px, 2.2vmin, 32px);
+	height: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+	overscroll-behavior: none;
+	background: var(--bg-1);
+	color: var(--fg-1);
+	font-family: var(--font-ui);
+	-webkit-font-smoothing: antialiased;
+	/* Kiosk: no selection, no callouts, no double-tap zoom. */
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+}
+
+#app {
+	height: 100%;
+}
+
+img {
+	-webkit-user-drag: none;
+}

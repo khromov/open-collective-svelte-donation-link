@@ -1,0 +1,25 @@
+{
+  "name": "open-collective-svelte-donation-link",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tsconfig/svelte": "^5.0.8",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.7"
+  },
+  "dependencies": {
+    "@fontsource/dm-serif-display": "^5.3.0",
+    "@fontsource/fira-sans": "^5.3.0",
+    "uqr": "^0.1.3"
+  }
+}
